@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Add Employee</h1>
+    <form action="" method="post">
+	{{ form.hidden_tag() }}
+	<p>
+	    {{ form.username.label }}<br>
+	    {{ form.username(size=32) }}
+	    {% for error in form.username.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+	</p>
+	<p>
+	    {{ form.password.label }}<br>
+	    {{ form.password(size=32) }}
+	    {% for error in form.password.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+	</p>
+	<p>
+	    {{ form.first_name.label }}<br>
+	    {{ form.first_name(size=32) }}
+	    {% for error in form.first_name.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+	</p>
+	<p>
+	    {{ form.last_name.label }}<br>
+	    {{ form.last_name(size=32) }}
+	    {% for error in form.last_name.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+	</p>
+	<p>
+	    {{ form.email.label }}<br>
+	    {{ form.email(size=32) }}
+	    {% for error in form.email.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+	</p>
+	<p>
+	    {{ form.role.label }}<br>
+	    {{ form.role(size=32) }}
+	    {% for error in form.role.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+	</p>
+	<p>
+	    {{ form.job_title.label }}<br>
+	    {{ form.job_title(size=32) }}
+	    {% for error in form.job_title.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+	</p>
+	<p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}
