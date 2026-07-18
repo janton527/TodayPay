@@ -45,3 +45,8 @@ a:hover {
     padding: 10px 25px;
     cursor: pointer;
 }
+
+#mileage {
+    display: flex;
+    justify-Content: center;
+}

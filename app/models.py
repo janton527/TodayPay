@@ -22,15 +22,26 @@ class User(UserMixin, db.Model):
             back_populates="user", uselist=False
             )
 
-    def __repr__(self):
-        return '<User {}>'.format(self.username)
-
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    @property
+    def is_admin(self):
+        return self.role == "admin"
+
+    @property
+    def is_manager(self):
+        return self.role in ("manager", "admin")
+    
+    @property
+    def is_employee(self):
+        return self.role in ("employee", "admin")
+
+    def __repr__(self):
+        return '<User {}>'.format(self.username)
 
 class Employee(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
@@ -38,6 +49,7 @@ class Employee(db.Model):
     last_name: so.Mapped[str] = so.mapped_column(sa.String(64))
     email: so.Mapped[str] = so.mapped_column(sa.String(64), unique=True)
     job_title: so.Mapped[Optional[str]] = so.mapped_column(sa.String(64))
+    pay_rate: so.Mapped[float] = so.mapped_column(sa.Float, server_default="0.0")
     user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey("user.id"), index=True)
 
     user: so.Mapped["User"] = so.relationship(back_populates="employee")

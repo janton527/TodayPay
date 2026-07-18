@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, abort
 import mysql.connector
 from app import app
 from app.forms import *
@@ -45,27 +45,78 @@ def login():
 
     return render_template('login.html', title='Sign in', form=form)
 
-@app.route('/addEmployee', methods=['GET', 'POST'])
+
+@app.route('/employees', methods=['GET', 'POST'])
+@login_required
+def employees():
+    if not current_user.is_manager:
+        abort(403)
+
+    query = sa.select(Employee)
+    employees = db.session.scalars(query).all()
+
+    return render_template('employees.html', title='Employees', employees=employees)
+
+@app.route('/employees/new', methods=['GET', 'POST'])
 @login_required
 def addEmployee():
+    if not current_user.is_manager:
+        abort(403)
+
     form = addEmployeeForm()
     if form.validate_on_submit():
+        existing_employee = Employee.query.filter_by(email=form.email.data).first()
+
+        if existing_employee:
+            flash("That email is already in use.")
+            return render_template('addEmployee.html', title='Add Employee', form=form)
+
+
         user = User(username=form.username.data, role=form.role.data)
         user.set_password(form.password.data)
         employee = Employee(
                 first_name=form.first_name.data,
                 last_name=form.last_name.data, 
                 email=form.email.data, 
-                job_title=form.job_title.data)
+                job_title=form.job_title.data,
+                pay_rate=form.pay_rate.data)
         employee.user = user
 
         db.session.add(user)
         db.session.add(employee)
         db.session.commit()
         flash('Employee Added!')
-        return redirect(url_for('index'))
+        return redirect(url_for('employees'))
 
     return render_template('addEmployee.html', title='Add Employee', form=form)
+
+@app.route('/employee/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+def editEmployee(id):
+    if not current_user.is_manager:
+        abort(403)
+
+    employee = Employee.query.filter_by(id=id).first()
+    print(employee)
+
+    form = editEmployeeForm(obj=employee)
+
+    if form.validate_on_submit():
+        employee.first_name=form.first_name.data
+        employee.last_name=form.last_name.data
+        employee.email=form.email.data
+        employee.job_title=form.job_title.data
+        employee.pay_rate=form.pay_rate.data
+
+        db.session.commit()
+        print("committed")
+        flash("Employee Updated")
+
+        return redirect(url_for('employees'))
+
+    return render_template(
+            'editEmployee.html', title='Edit Employee', form=form, employee=employee)
+
 
 @app.route('/commuteLog', methods=['GET', 'POST'])
 @login_required
@@ -73,17 +124,23 @@ def commuteLog():
     form = commuteLogForm()
     
     if form.validate_on_submit():
-        commute = CommuteLog.query.filter_by(
-                employee_id=current_user.employee.id, mileage=None
+        commute = CommuteLog.query.filter(
+                CommuteLog.employee_id==current_user.employee.id,
+                CommuteLog.start_time.isnot(None),
+                CommuteLog.end_time.isnot(None),
+                CommuteLog.mileage.is_(None)
         ).order_by(
                 CommuteLog.start_time.desc()
         ).first()
 
         if commute:
+            print(commute)
             commute.mileage = float(request.form["mileage"])
             db.session.commit()
-            flash("Mileage Added!")
+            flash("Mileage added. Commute Log complete.")
             return redirect(url_for('index'))
+        else: 
+            flash("No pending commutes.")
 
     return render_template('commuteLog.html', title='Commute Log', form=form)
 
@@ -104,8 +161,10 @@ def start_commute():
 
     db.session.add(commute)
     db.session.commit()
+    flash("Commute Started")
 
     return redirect(url_for('commuteLog'))
+
 
 @app.route('/end_commute', methods=['POST'])
 @login_required
@@ -117,25 +176,10 @@ def end_commute():
     if commute: 
         commute.end_time = datetime.utcnow()
         db.session.commit()
+        flash("Commute Ended")
 
     return redirect(url_for("commuteLog"))
 
-@app.route('/submit_mileage', methods=['POST'])
-@login_required
-def submit_mileage():
-
-    commute = CommuteLog.query.filter_by(
-            employee_id=current_user.employee.id, mileage=None
-    ).order_by(
-            CommuteLog.start_time.desc()
-    ).first()
-
-    if commute:
-        commute.mileage = float(request.form["mileage"])
-        db.session.commit()
-        flash("Mileage Added!")
-
-    return redirect(url_for('commuteLog'))
 
 @app.route('/logout')
 def logout():

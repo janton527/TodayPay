@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>UNDER CONSTRUCTION</h1>
+    <h1>Employees</h1>
+    {% if employees %}
+    <table border="1">
+	<thead>
+	    <tr>
+		<th>First Name</th>
+		<th>Last Name</th>
+		<th>Username</th>
+		<th>Email</th>
+		<th>Job Title</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for employee in employees %}
+	    <tr>
+		<td>{{ employee.first_name }}</td>
+		<td>{{ employee.last_name }}</td>
+		<td>{{ employee.email }}</td>
+		<td>{{ employee.username }}</td>
+		<td>{{ employee.job_title }}</td>
+		<td><a href="{{ url_for('editEmployee', id=employee.id) }}">Edit</a></td>
+	    </tr>
+	    {% endfor %}
+	</tbody>
+    </table>
+    {% else %}
+    <p>No Employees Found.</p>
+    {% endif %}
+    <br>
+    <a href="{{ url_for('addEmployee') }}">
+	<button>New Employee</button>
+    </a>
+   
+{% endblock %}

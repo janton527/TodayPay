@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Under Construction</h1>
     <h1>Commute Log</h1>
 
     <div id="clock">
@@ -18,18 +17,19 @@
 	</form>
     </div>
 
-    <form action="" method="post">
-	{{ form.hidden_tag() }}
-	<p>
-	    {{ form.mileage.label }}<br>
-	    {{ form.mileage(size=32) }}<br>
-	    {% for error in form.mileage.errors %}
-	    <span style="color: red;">[{{ error }}]</span>
-	    {% endfor %}
-	</p>
-	<p>{{ form.submit() }}</p>
-    </form>
-
+    <div id="mileage">
+	<form action="" method="post">
+	    {{ form.hidden_tag() }}
+	    <p>
+		{{ form.mileage.label }}<br>
+		{{ form.mileage(size=32) }}<br>
+		{% for error in form.mileage.errors %}
+		<span style="color: red;">[{{ error }}]</span>
+		{% endfor %}
+	    </p>
+	    <p>{{ form.submit() }}</p>
+	</form>
+    </div>
 
     <script src="{{ url_for('static', filename='clock.js') }}"></script>
 
