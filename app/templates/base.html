@@ -1,11 +1,14 @@
 <!doctype html>
-<html>
+<html lang="en">
     <head>
+	<meta charset="UTF-8">
 	{% if title %}
 	<title>{{ title }} - TodayPay</title>
 	{% else %}
 	<title>Welcom to TodayPay</title>
 	{% endif %}
+
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     </head>
     <body>
 	<div>
@@ -14,6 +17,7 @@
 	    {% if current_user.is_anonymous %}
 	    <a href="{{ url_for('login') }}">Login</a>
 	    {% else %}
+	    <a href="{{ url_for('commuteLog') }}">Commute Log</a>
 	    <a href="{{ url_for('addEmployee') }}">Add Employee</a>
 	    <a href="{{ url_for('logout') }}">Logout</a>
 	    {% endif %}

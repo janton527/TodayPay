@@ -1,0 +1,47 @@
+body {
+    margin: 0;
+    height: 100vh;
+
+    display: flex:
+    justify-content: center;
+    align-items: center;
+
+    background: #1f2937;
+    color: white;
+
+    font-family: Arial, sans-serif;
+}
+
+a {
+    color: #66d9ff;
+}
+
+a:visited {
+    color: #e0b0ff;
+}
+
+a:hover {
+    color: #ffffff;
+}
+
+#clock {
+    font-size: 6rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.commute-buttons{
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.commute-buttons form {
+    display: inline-block;
+}
+
+.commute-buttons button {
+    font-size: 1.5rem;
+    padding: 10px 25px;
+    cursor: pointer;
+}

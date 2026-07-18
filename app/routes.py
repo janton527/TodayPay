@@ -5,7 +5,8 @@ from app.forms import *
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
 from app import db
-from app.models import User
+from app.models import User, Employee, CommuteLog
+from datetime import datetime
 from urllib.parse import urlsplit
 
 def get_db():
@@ -65,6 +66,76 @@ def addEmployee():
         return redirect(url_for('index'))
 
     return render_template('addEmployee.html', title='Add Employee', form=form)
+
+@app.route('/commuteLog', methods=['GET', 'POST'])
+@login_required
+def commuteLog():
+    form = commuteLogForm()
+    
+    if form.validate_on_submit():
+        commute = CommuteLog.query.filter_by(
+                employee_id=current_user.employee.id, mileage=None
+        ).order_by(
+                CommuteLog.start_time.desc()
+        ).first()
+
+        if commute:
+            commute.mileage = float(request.form["mileage"])
+            db.session.commit()
+            flash("Mileage Added!")
+            return redirect(url_for('index'))
+
+    return render_template('commuteLog.html', title='Commute Log', form=form)
+
+
+@app.route('/start_commute', methods=['POST'])
+@login_required
+def start_commute():
+
+    active_commute = CommuteLog.query.filter_by(
+        employee_id=current_user.employee.id, end_time=None
+    ).first()
+
+    if active_commute: 
+        flash("You already have an active commute.")
+        return redirect(url_for('commuteLog'))
+
+    commute = CommuteLog(employee_id=current_user.employee.id)
+
+    db.session.add(commute)
+    db.session.commit()
+
+    return redirect(url_for('commuteLog'))
+
+@app.route('/end_commute', methods=['POST'])
+@login_required
+def end_commute():
+    commute = CommuteLog.query.filter_by(
+            employee_id=current_user.employee.id, end_time=None
+            ).first()
+
+    if commute: 
+        commute.end_time = datetime.utcnow()
+        db.session.commit()
+
+    return redirect(url_for("commuteLog"))
+
+@app.route('/submit_mileage', methods=['POST'])
+@login_required
+def submit_mileage():
+
+    commute = CommuteLog.query.filter_by(
+            employee_id=current_user.employee.id, mileage=None
+    ).order_by(
+            CommuteLog.start_time.desc()
+    ).first()
+
+    if commute:
+        commute.mileage = float(request.form["mileage"])
+        db.session.commit()
+        flash("Mileage Added!")
+
+    return redirect(url_for('commuteLog'))
 
 @app.route('/logout')
 def logout():

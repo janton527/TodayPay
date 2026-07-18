@@ -1,4 +1,5 @@
 from typing import Optional
+from datetime import datetime
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 from app import db, login
@@ -37,11 +38,23 @@ class Employee(db.Model):
     last_name: so.Mapped[str] = so.mapped_column(sa.String(64))
     email: so.Mapped[str] = so.mapped_column(sa.String(64), unique=True)
     job_title: so.Mapped[Optional[str]] = so.mapped_column(sa.String(64))
-    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id), index=True)
+    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey("user.id"), index=True)
 
     user: so.Mapped["User"] = so.relationship(back_populates="employee")
+    commute_logs: so.Mapped[list["CommuteLog"]] = so.relationship(back_populates="employee")
 
     def __repr__(self):
         return '<Employee Email {}>'.format(self.email)
 
+class CommuteLog(db.Model):
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    employee_id: so.Mapped[int] = so.mapped_column(
+            sa.ForeignKey("employee.id"), index=True)
 
+    start_time: so.Mapped[datetime] = so.mapped_column(
+            sa.DateTime, default=datetime.utcnow, nullable=False)
+    end_time: so.Mapped[datetime | None] = so.mapped_column(sa.DateTime, nullable=True)
+
+    mileage: so.Mapped[float] = so.mapped_column(sa.Float, nullable=True)
+
+    employee: so.Mapped["Employee"] = so.relationship(back_populates="commute_logs")

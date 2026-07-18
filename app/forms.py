@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, FloatField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 import sqlalchemy as sa
 from app import db
@@ -33,3 +33,11 @@ class addEmployeeForm(FlaskForm):
             Employee.email == email.data))
         if employee is not None:
             raise ValidationError('Please use a different email address.')
+
+class commuteLogForm(FlaskForm):
+    start_commute = SubmitField('Start Commute')
+    end_commute = SubmitField('End Commute')
+
+    mileage = FloatField('Mileage', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
