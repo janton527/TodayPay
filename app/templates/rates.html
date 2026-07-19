@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Rates</h1>
+<form method="post">
+    {{ form.hidden_tag() }}
+    <p>
+	{{ form.commute_rate.label }}<br>
+	{{ form.commute_rate(size=32) }}
+    </p>
+    <p>
+	{{ form.mile_reimbursement.label }}<br>
+	{{ form.mile_reimbursement(size=32) }}
+    </p>
+    <p>{{ form.submit() }}</p>
+</form>
+{% endblock %}

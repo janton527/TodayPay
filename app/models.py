@@ -55,6 +55,7 @@ class Employee(db.Model):
 
     user: so.Mapped["User"] = so.relationship(back_populates="employee")
     commute_logs: so.Mapped[list["CommuteLog"]] = so.relationship(back_populates="employee")
+    rates: so.Mapped["Rates"] = so.relationship(back_populates="employee")
 
     def __repr__(self):
         return '<Employee Email {}>'.format(self.email)
@@ -71,3 +72,14 @@ class CommuteLog(db.Model):
     mileage: so.Mapped[float] = so.mapped_column(sa.Float, nullable=True)
 
     employee: so.Mapped["Employee"] = so.relationship(back_populates="commute_logs")
+
+class Rates(db.Model):
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    commute_rate: so.Mapped[float] = so.mapped_column(sa.Float)
+    mile_reimbursement: so.Mapped[float] = so.mapped_column(sa.Float)
+    date: so.Mapped[datetime] = so.mapped_column(
+            sa.DateTime, default=datetime.utcnow, nullable=False)
+    changed_by: so.Mapped[int] = so.mapped_column(sa.ForeignKey("employee.id"))
+    is_active: so.Mapped[bool] = so.mapped_column(sa.Boolean, server_default=sa.true())
+
+    employee: so.Mapped["Employee"] = so.relationship(back_populates="rates")

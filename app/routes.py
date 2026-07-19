@@ -5,7 +5,7 @@ from app.forms import *
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
 from app import db
-from app.models import User, Employee, CommuteLog
+from app.models import User, Employee, CommuteLog, Rates
 from datetime import datetime
 from urllib.parse import urlsplit
 
@@ -45,6 +45,32 @@ def login():
 
     return render_template('login.html', title='Sign in', form=form)
 
+
+@app.route('/rates', methods=['GET', 'POST'])
+@login_required
+def rates():
+    if not current_user.is_manager:
+        abort(403)
+
+    rate = Rates.query.filter_by(is_active=True).first()
+
+    form = RatesForm(obj=rate)
+
+    if form.validate_on_submit():
+        if rate:
+            rate.is_active=False
+
+        new_rate = Rates(commute_rate=form.commute_rate.data,
+                         mile_reimbursement = form.mile_reimbursement.data,
+                         changed_by=current_user.employee.id)
+
+        db.session.add(new_rate)
+        db.session.commit()
+        flash("Rates Updated")
+        return redirect(url_for("index"))
+
+    return render_template('rates.html', title="Rates", form=form, rate=rate)
+    
 
 @app.route('/employees', methods=['GET', 'POST'])
 @login_required
@@ -146,7 +172,6 @@ def commuteLog():
         ).first()
 
         if commute:
-            print(commute)
             commute.mileage = float(request.form["mileage"])
             db.session.commit()
             flash("Mileage added. Commute Log complete.")

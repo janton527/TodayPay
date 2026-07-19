@@ -51,3 +51,9 @@ class commuteLogForm(FlaskForm):
     mileage = FloatField('Mileage', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
+class RatesForm(FlaskForm):
+    commute_rate = FloatField('Commute Pay Rate')
+    mile_reimbursement = FloatField('Mileage Reimbursement')
+
+    submit = SubmitField('Submit')
+
