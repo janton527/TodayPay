@@ -1,4 +1,5 @@
 # TodayPay
+TodayPay is a payroll and reimbursement management system designed for contractors and hourly workers that are required to travel to the work site. The system aims to simplify payroll management by combining time tracking, mileage reimbursement, and expense reporting into a single centralized application. 
 
 ## Setup
 1. Clone repository
