@@ -1,5 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Hello, {{current_user.username }}!</h1>
+    <h1>Hello, {{current_user.employee.first_name }}!</h1>
+    <h3>Weekly Stats</h3>
+    <table>
+
+	{% for stat, value in stats.items() %}
+	<tr>
+	    <td>{{ stat }}</td>
+	    <td>{{ value }}</td>
+	</tr>
+	{% endfor %}
+    </table>
+
 {% endblock %}

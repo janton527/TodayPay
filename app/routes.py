@@ -6,22 +6,49 @@ from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
 from app import db
 from app.models import User, Employee, CommuteLog, Rates
-from datetime import datetime
+from datetime import datetime, timedelta
 from urllib.parse import urlsplit
 
-def get_db():
-    return mysql.connector.connect(
-            host='localhost', 
-            user='root',
-            password='root',
-            database='today_pay'
-            )
 
 @app.route('/')
 @app.route('/index')
 @login_required
 def index():
-    return render_template('index.html', title='Home')
+    today = datetime.now()
+    start_of_week = (today - timedelta(days=today.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+
+    commutes = CommuteLog.query.filter(
+            CommuteLog.employee_id == current_user.employee.id,
+            CommuteLog.start_time >= start_of_week
+        ).all()
+
+    rate = Rates.query.filter_by(is_active=True).first()
+
+    total_time= timedelta()
+    total_miles=0.0
+
+    for commute in commutes:
+        if commute.end_time:
+            total_time+= commute.end_time - commute.start_time
+
+        total_miles+= commute.mileage
+
+    hours = round(total_time.total_seconds() / 3600, 2)
+    commute_pay = rate.commute_rate * hours
+    mileage_pay = rate.mile_reimbursement * total_miles
+
+    stats={
+        "commute hours": hours,
+        "mileage": total_miles,
+        "number of trips": len(commutes),
+        "commute pay": commute_pay,
+        "mileage reimbursement": mileage_pay
+            }
+
+    for stat, value in stats.items():
+        print(stat, ": ", value)
+    
+    return render_template('index.html', title='Home', stats=stats)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
