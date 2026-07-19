@@ -50,6 +50,7 @@ class Employee(db.Model):
     email: so.Mapped[str] = so.mapped_column(sa.String(64), unique=True)
     job_title: so.Mapped[Optional[str]] = so.mapped_column(sa.String(64))
     pay_rate: so.Mapped[float] = so.mapped_column(sa.Float, server_default="0.0")
+    is_active: so.Mapped[bool] = so.mapped_column(sa.Boolean, server_default=sa.true())
     user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey("user.id"), index=True)
 
     user: so.Mapped["User"] = so.relationship(back_populates="employee")

@@ -97,7 +97,6 @@ def editEmployee(id):
         abort(403)
 
     employee = Employee.query.filter_by(id=id).first()
-    print(employee)
 
     form = editEmployeeForm(obj=employee)
 
@@ -109,7 +108,6 @@ def editEmployee(id):
         employee.pay_rate=form.pay_rate.data
 
         db.session.commit()
-        print("committed")
         flash("Employee Updated")
 
         return redirect(url_for('employees'))
@@ -117,6 +115,20 @@ def editEmployee(id):
     return render_template(
             'editEmployee.html', title='Edit Employee', form=form, employee=employee)
 
+@app.route('/employee/<int:id>/delete', methods=['GET', 'POST'])
+@login_required
+def deleteEmployee(id):
+    if not current_user.is_manager:
+        abort(403)
+
+    employee = Employee.query.filter_by(id=id).first()
+
+    employee.is_active = False
+    db.session.commit()
+
+    flash("Employee Removed")
+    return redirect(url_for("employees"))
+              
 
 @app.route('/commuteLog', methods=['GET', 'POST'])
 @login_required
