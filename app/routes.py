@@ -14,6 +14,7 @@ from urllib.parse import urlsplit
 @app.route('/index')
 @login_required
 def index():
+    stats = {}
     today = datetime.now()
     start_of_week = (today - timedelta(days=today.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
 
@@ -34,16 +35,17 @@ def index():
         total_miles+= commute.mileage
 
     hours = round(total_time.total_seconds() / 3600, 2)
-    commute_pay = rate.commute_rate * hours
-    mileage_pay = rate.mile_reimbursement * total_miles
+    commute_pay = round(rate.commute_rate * hours, 2)
+    mileage_pay = round(rate.mile_reimbursement * total_miles, 2)
 
-    stats={
-        "commute hours": hours,
-        "mileage": total_miles,
-        "number of trips": len(commutes),
-        "commute pay": commute_pay,
-        "mileage reimbursement": mileage_pay
-            }
+    if current_user.role == "employee":
+        stats={
+            "commute hours": hours,
+            "mileage": total_miles,
+            "number of trips": len(commutes),
+            "commute pay": commute_pay,
+            "mileage reimbursement": mileage_pay
+                }
 
     return render_template('index.html', title='Home', stats=stats)
 
