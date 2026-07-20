@@ -9,7 +9,7 @@ from app.models import User, Employee, CommuteLog, Rates
 from datetime import datetime, timedelta
 from urllib.parse import urlsplit
 
-
+#--------------Dashboard Module------------------#
 @app.route('/')
 @app.route('/index')
 @login_required
@@ -45,11 +45,10 @@ def index():
         "mileage reimbursement": mileage_pay
             }
 
-    for stat, value in stats.items():
-        print(stat, ": ", value)
-    
     return render_template('index.html', title='Home', stats=stats)
 
+
+#--------------Authentication Module------------------#
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -73,6 +72,13 @@ def login():
     return render_template('login.html', title='Sign in', form=form)
 
 
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+
+#--------------Payroll Module------------------#
 @app.route('/rates', methods=['GET', 'POST'])
 @login_required
 def rates():
@@ -99,6 +105,7 @@ def rates():
     return render_template('rates.html', title="Rates", form=form, rate=rate)
     
 
+#--------------Employee Module------------------#
 @app.route('/employees', methods=['GET', 'POST'])
 @login_required
 def employees():
@@ -183,6 +190,7 @@ def deleteEmployee(id):
     return redirect(url_for("employees"))
               
 
+#--------------Time Management Module------------------#
 @app.route('/commuteLog', methods=['GET', 'POST'])
 @login_required
 def commuteLog():
@@ -193,7 +201,7 @@ def commuteLog():
                 CommuteLog.employee_id==current_user.employee.id,
                 CommuteLog.start_time.isnot(None),
                 CommuteLog.end_time.isnot(None),
-                CommuteLog.mileage.is_(None)
+                CommuteLog.mileage == 0
         ).order_by(
                 CommuteLog.start_time.desc()
         ).first()
@@ -243,9 +251,3 @@ def end_commute():
         flash("Commute Ended")
 
     return redirect(url_for("commuteLog"))
-
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))

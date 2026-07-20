@@ -69,7 +69,7 @@ class CommuteLog(db.Model):
             sa.DateTime, default=datetime.utcnow, nullable=False)
     end_time: so.Mapped[datetime | None] = so.mapped_column(sa.DateTime, nullable=True)
 
-    mileage: so.Mapped[float] = so.mapped_column(sa.Float, nullable=True)
+    mileage: so.Mapped[float] = so.mapped_column(sa.Float, nullable=True, default=0)
 
     employee: so.Mapped["Employee"] = so.relationship(back_populates="commute_logs")
 
