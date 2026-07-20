@@ -3,18 +3,18 @@ TodayPay is a payroll and reimbursement management system designed for contracto
 
 ## Setup
 1. Clone repository
-2. Create a veritual enviroment
+2. Create a virtual environment
 
-python -m venv venv
+    python -m venv venv
 
-3. Activate virtualeviroment
+3. Activate virtual environment
 
-source venv/bin/activate
+    source venv/bin/activate
 
 4. Install Dependancies
 
-pip install -r requirements.txt
+    pip install -r requirements.txt
 
 5. Run the application 
 
-flask run
+    flask run
